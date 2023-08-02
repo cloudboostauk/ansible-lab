@@ -1,0 +1,175 @@
+# This playbook is named "Different tasks based on OS". It will run on all hosts, and will become the root user for executing commands.
+- name: Deploy different websites across 3 Hosts based on the OS of the Host
+  hosts: all
+  become: yes
+
+  # These variables are being defined for use in the tasks later.
+  vars:
+    debian_repo: "https://github.com/cloudboostauk/chain-app.git"
+    redhat_repo: "https://github.com/cloudboostauk/crypto-app.git"
+    website_dir: "/var/www/html"
+
+  # These are the tasks that will be run on the hosts.
+  tasks:
+  
+  # This group of tasks is only run when the operating system is Debian or a Debian derivative like Ubuntu.
+  - name: Update apt cache
+    apt: 
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+
+  - name: Create user www-data (Debian)
+    user:
+      name: www-data
+      state: present
+    when: ansible_os_family == "Debian"
+
+  - name: Install Git (Debian)
+    apt:
+      name: git
+      state: present
+    when: ansible_os_family == "Debian"
+
+  - name: Install Apache (Debian)
+    apt:
+      name: apache2
+      state: present
+    when: ansible_os_family == "Debian"
+
+  - name: Enable Apache service (Debian)
+    systemd:
+      name: apache2
+      enabled: yes
+    when: ansible_os_family == "Debian"
+
+  - name: Install PHP (Debian)
+    apt: 
+      name: php
+      state: present
+    when: ansible_os_family == "Debian"
+
+  - name: Ensure web root directory exists (Debian)
+    file:
+      path: "{{ website_dir }}"
+      state: directory
+    when: ansible_os_family == "Debian"
+
+  - name: Set permissions for web root directory (Debian)
+    file:
+      path: "{{ website_dir }}"
+      mode: '0755'
+    when: ansible_os_family == "Debian"
+    become: yes
+
+  - name: Set ownership for web root directory (Debian)
+    file:
+      path: "{{ website_dir }}/*"
+      owner: www-data
+      group: www-data
+      recurse: yes
+    become: yes
+    when: ansible_os_family == "Debian"
+
+  - name: Delete existing files in web root (Debian)
+    shell: "rm -rf {{ website_dir }}/*"
+    when: ansible_os_family == "Debian"
+    become: yes
+    
+  - name: Delete existing files in web root (Debian)
+    file:
+      path: "{{ website_dir }}/*"
+      state: absent
+    when: ansible_os_family == "Debian"
+    become: yes
+
+  - name: Clone website (Debian)
+    git:
+      repo: "{{ debian_repo }}"
+      dest: "{{ website_dir }}"
+      update: yes
+      force: yes
+    when: ansible_os_family == "Debian"
+    become: yes
+
+  - name: Start Apache service (Debian)
+    service:
+      name: apache2
+      state: started
+      enabled: yes
+    when: ansible_os_family == "Debian"
+
+  # This group of tasks is only run when the operating system is RedHat or a RedHat derivative like CentOS.
+  - name: Update YUM cache
+    yum: 
+      update_cache: yes
+    when: ansible_os_family == "RedHat"
+
+  - name: Create user ec2-user (RedHat)
+    user:
+      name: ec2-user
+      state: present
+    when: ansible_os_family == "RedHat"
+
+  - name: Install Git (RedHat)
+    yum:
+      name: git
+      state: present
+    when: ansible_os_family == "RedHat"
+
+  - name: Install httpd (RedHat)
+    yum:
+      name: httpd
+      state: present
+    when: ansible_os_family == "RedHat"
+
+  - name: Enable httpd service (RedHat)
+    systemd:
+      name: httpd
+      enabled: yes
+    when: ansible_os_family == "RedHat"
+
+  - name: Ensure web root directory exists (RedHat)
+    file:
+      path: "{{ website_dir }}"
+      state: directory
+    when: ansible_os_family == "RedHat"
+
+  - name: Set permissions for web root directory (RedHat)
+    file:
+      path: "{{ website_dir }}"
+      mode: '0755'
+    when: ansible_os_family == "RedHat"
+    become: yes
+
+  - name: Set ownership for web root directory (RedHat)
+    file:
+      path: "{{ website_dir }}"
+      owner: ec2-user
+      group: ec2-user
+      recurse: yes
+    become: yes
+    when: ansible_os_family == "RedHat"
+
+  - name: Delete existing files in web root (RedHat)
+    file:
+      path: "{{ website_dir }}/*"
+      state: absent
+    when: ansible_os_family == "RedHat"
+    become: yes
+
+
+  - name: Clone website (RedHat)
+    git:
+      repo: "{{ redhat_repo }}"
+      dest: "{{ website_dir }}"
+      update: yes
+      force: yes
+    when: ansible_os_family == "RedHat"
+    become: yes
+
+  - name: Start httpd service (RedHat)
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+    when: ansible_os_family == "RedHat"

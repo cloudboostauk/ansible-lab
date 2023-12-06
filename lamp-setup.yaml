@@ -55,7 +55,7 @@
 
     - name: Delete existing files in web root
       file:
-        path: "/var/www/html/*"
+        path: "/var/www/html/"
         state: absent
       become: yes  # This also runs the task as the root user
 

@@ -9,7 +9,8 @@ apt-get update -y
 apt install software-properties-common -y
 apt-add-repository --yes --update ppa:ansible/ansible
 apt-get install ansible -y
-pip install boto3 
+sudo apt install python3-boto3 -y
+
 
 apt-get install git -y
 

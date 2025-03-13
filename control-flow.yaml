@@ -81,6 +81,11 @@
       state: absent
     when: ansible_distribution == "Ubuntu"
     become: yes
+    
+  - name: Configure Git safe directory
+    shell: git config --global --add safe.directory {{ website_dir }}
+    when: ansible_distribution == "Ubuntu"
+    become: yes
 
   - name: Clone website on Ubuntu servers 
     git:

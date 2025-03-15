@@ -55,6 +55,17 @@ ansible all -m yum -a "name=httpd state=present" --become
 ansible all -m service -a "name=nginx state=started" --become #to start
 
 
+# 
+ansible all -a "python --version"
+ansible dev -a "python --version"
+
+ansible groupofgroups -a "python --version"
+ansible devsubset -a "python --version"
+
+ansible --list-host all
+ansible --list-host dev
+
+
 ####playbook
 ---
 - name: Ansible Playbook for Basic Tasks

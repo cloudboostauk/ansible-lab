@@ -1,4 +1,11 @@
+---
+- hosts: all
+  tasks:
+    - name: Ping All Servers
+      action: ping
+    - debug: msg="Hello world"
 
+    
 ---
 - name: Test connectivity to all hosts
   hosts: all
@@ -16,6 +23,16 @@
         path: /tmp/testfile.txt
         state: touch
 
+- name: Create a folder
+  hosts: all
+  become: yes
+  tasks:
+    - name: Create a file in /tmp directory
+      ansible.builtin.file:
+        path: /home/ec2-user/cba_ansible
+        state: directory
+
+        
 #Check Connectivity (Ping)
 ansible all -m ping
 

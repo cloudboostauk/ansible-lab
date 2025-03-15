@@ -1,4 +1,36 @@
 
+---
+- name: Test connectivity to all hosts
+  hosts: all
+  tasks:
+    - name: Ping all nodes
+      ansible.builtin.ping:
+
+---
+- name: Create a test file
+  hosts: all
+  become: yes
+  tasks:
+    - name: Create a file in /tmp directory
+      ansible.builtin.file:
+        path: /tmp/testfile.txt
+        state: touch
+
+
+---
+- name: Clone a GitHub repository
+  hosts: all
+  become: yes
+  tasks:
+    - name: Clone a repository into /var/www/html
+      ansible.builtin.git:
+        repo: "https://github.com/example/repo.git"
+        dest: "/var/www/html"
+        version: "main"
+
+
+
+
 #Check Connectivity (Ping)
 ansible all -m ping
 

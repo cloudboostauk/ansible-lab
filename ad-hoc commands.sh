@@ -16,21 +16,6 @@
         path: /tmp/testfile.txt
         state: touch
 
-
----
-- name: Clone a GitHub repository
-  hosts: all
-  become: yes
-  tasks:
-    - name: Clone a repository into /var/www/html
-      ansible.builtin.git:
-        repo: "https://github.com/example/repo.git"
-        dest: "/var/www/html"
-        version: "main"
-
-
-
-
 #Check Connectivity (Ping)
 ansible all -m ping
 

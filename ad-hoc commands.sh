@@ -95,3 +95,14 @@ ansible all -m service -a "name=nginx state=started" --become #to start
       ansible.builtin.service:
         name: httpd
         state: started
+
+
+  # 
+  ---
+- name: Apply Web Server Role
+  hosts: all
+  become: yes
+
+  roles:
+    - webserver_role
+

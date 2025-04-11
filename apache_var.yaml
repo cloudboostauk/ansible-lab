@@ -1,0 +1,42 @@
+---
+- name: Set up Apache Web Server on Ubuntu nodes     # High-level description of what this playbook does
+  hosts: webservers                                  # Target hosts (defined in your inventory file)
+  become: yes                                        # Run all tasks with sudo/root privileges
+  gather_facts: yes                                  # Collect system info (OS, IP, RAM, etc.) before running tasks
+
+  vars:                                              # Define reusable variables to avoid hardcoding
+    apache_package: apache2                          # The name of the Apache package
+    apache_service: apache2                          # Name of the service to control (start/restart)
+    website_root: /var/www/html                     # Root directory for website files
+    index_file: index.html                           # Default homepage file
+
+  tasks:                                             # List of actions Ansible will execute on target nodes
+    - name: Update apt cache                         # TASK 1: Run 'apt update' to refresh package metadata
+      apt:
+        update_cache: yes                            # Same as running 'sudo apt update' in terminal
+      tags: update                                   # Tag for this task (useful for selective execution)
+
+    - name: Install Apache Web Server                # TASK 2: Install Apache if not already present
+      apt:
+        name: "{{ apache_package }}"                 # Use variable for better reusability
+        state: present                               # Ensure the package is installed (idempotent)
+      tags: install                                  # You can run this task alone with --tags install
+
+    - name: Ensure website directory exists          # TASK 3: Make sure web root exists before copying files
+      file:
+        path: "{{ website_root }}"                   # The path to check/create
+        state: directory                             # Ensure it's a directory
+      tags: setup
+
+    - name: Deploy default HTML page                 # TASK 4: Create a basic index.html file
+      copy:
+        content: "<h1>Welcome to Ansible Web Server</h1>"  # Inline content for homepage
+        dest: "{{ website_root }}/{{ index_file }}"  # Full path to where the file should go
+      notify: restart apache                         # If content changes, notify the handler
+      tags: deploy
+
+  handlers:                                          # Define "handlers" — tasks that run only when notified
+    - name: restart apache                           # This will restart Apache service
+      service:
+        name: "{{ apache_service }}"                 # Use variable for service name
+        state: restarted                             # Ensures the service restarts if notified

@@ -1,0 +1,36 @@
+---
+- name: Install and configure Apache Web Server on Ubuntu
+  hosts: webservers                             # Target group from inventory file
+  become: yes                                   # Run all tasks with sudo privileges
+  gather_facts: yes                             # Collect system information before tasks begin
+
+  tasks:
+    - name: Update apt cache                    # Step 1: Refresh package index
+      apt:
+        update_cache: yes
+      tags: update
+
+    - name: Install Apache                      # Step 2: Install the Apache2 web server
+      apt:
+        name: apache2
+        state: present
+      tags: install
+
+    - name: Ensure the web root directory exists  # Step 3: Make sure /var/www/html exists
+      file:
+        path: /var/www/html
+        state: directory
+      tags: setup
+
+    - name: Deploy a simple HTML homepage       # Step 4: Create a basic index.html
+      copy:
+        content: "<h1>Welcome to Ansible Web Server</h1>"
+        dest: /var/www/html/index.html
+      notify: restart apache
+      tags: deploy
+
+  handlers:
+    - name: restart apache                      # Handler to restart Apache if the index.html changes
+      service:
+        name: apache2
+        state: restarted

@@ -1,3 +1,30 @@
+       
+#Check Connectivity (Ping)
+ansible all -m ping
+
+#Gather System Information (Facts)
+ansible all -m setup
+ansible -m setup -a 'filter=ansible_distribution' all
+
+#Create a File
+ansible all -m file -a "path=/home/ec2-user/testfile.txt state=touch"
+
+#Create a Directory
+ansible all -m file -a "path=/home/ec2-user/newdir state=directory"
+
+#Delete a File
+ansible all -m file -a "path=/tmp/testfile state=absent"
+
+ansible all -a "python --version"
+ansible dev -a "python --version"
+
+ansible groupofgroups -a "python --version"
+ansible devsubset -a "python --version"
+
+ansible --list-host all
+ansible --list-host dev
+
+
 ---
 - hosts: all
   tasks:
@@ -32,22 +59,7 @@
         path: /home/ec2-user/cba_ansible
         state: directory
 
-        
-#Check Connectivity (Ping)
-ansible all -m ping
-
-#Gather System Information (Facts)
-ansible all -m setup
-ansible -m setup -a 'filter=ansible_distribution' all
-
-#Create a File
-ansible all -m file -a "path=/home/ec2-user/testfile.txt state=touch"
-
-#Create a Directory
-ansible all -m file -a "path=/home/ec2-user/newdir state=directory"
-
-#Delete a File
-ansible all -m file -a "path=/tmp/testfile state=absent"
+ 
 
 #Installs nginx using apt
 ansible all -m apt -a "name=nginx state=present" --become
@@ -56,14 +68,7 @@ ansible all -m service -a "name=nginx state=started" --become #to start
 
 
 # 
-ansible all -a "python --version"
-ansible dev -a "python --version"
 
-ansible groupofgroups -a "python --version"
-ansible devsubset -a "python --version"
-
-ansible --list-host all
-ansible --list-host dev
 
 
 ####playbook
